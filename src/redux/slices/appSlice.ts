@@ -1,10 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  Category,
-  FullLineImage,
-  categories,
-} from "../../components/home/categories";
-import { getDominantCategories } from "../../components/reflection/getDominantCategories";
+import { Skill, Task } from "../../types/skill";
 
 export interface RdxAction<T> {
   type: string;
@@ -12,25 +7,11 @@ export interface RdxAction<T> {
 }
 
 export interface AppInfo {
-  categories: Category[];
-  currentCategory: Category | null;
-  selectedCategories: number[];
-  tutorialOpen: boolean;
-  reflection:
-    | {
-        text: string;
-        icon: any;
-        score: number;
-      }[]
-    | null;
+  skills: Skill[];
 }
 
 const initialState: AppInfo = {
-  categories: categories,
-  currentCategory: null,
-  selectedCategories: [],
-  tutorialOpen: true,
-  reflection: null,
+  skills: [],
 };
 
 export const appSlice: any = createSlice({
@@ -42,141 +23,49 @@ export const appSlice: any = createSlice({
         return state;
       }
 
-      let { categories } = action.payload;
-
-      const thisWeek = new Date();
-      thisWeek.setDate(new Date().getDate() - 7);
-
-      const count = Math.max(
-        ...categories.map(
-          (c) => c.images.filter((im) => new Date(im.date) >= thisWeek).length
-        )
-      );
-
-      if (count > 0) {
-        categories = categories.map((cat) => {
-          const imageCount = cat.images.filter(
-            (im) => new Date(im.date) >= thisWeek
-          ).length;
-
-          const h = (imageCount / count) * 100;
-
-          return {
-            ...cat,
-            height: imageCount > 0 ? h : 0,
-          };
-        });
-      }
-
-      const data = getDominantCategories(categories);
+      let { skills } = action.payload;
 
       return {
-        ...action.payload,
-        categories: categories,
-        selectedCategories: [],
-        reflection: data,
+        skills,
       };
     },
-    setCurrentCategory: (state, action: RdxAction<Category | null>) => {
+    addNewSkill: (state, action: RdxAction<Skill>) => {
       return {
         ...state,
-        currentCategory: action.payload,
+        skills: [...state.skills, action.payload],
       };
     },
-    setTutorialOpen: (state, action: RdxAction<boolean>) => {
+    removeSkill: (state, action: RdxAction<string>) => {
       return {
         ...state,
-        tutorialOpen: action.payload,
+        skills: state.skills.filter((s) => s.title !== action.payload),
       };
     },
-    selectCategory: (state, action: RdxAction<number | null>) => {
-      if (!action.payload) {
-        return {
-          ...state,
-          selectedCategories: [],
-        };
-      }
-
-      const selected = state.selectedCategories.some(
-        (cat) => cat === action.payload
-      );
-      if (selected) {
-        return {
-          ...state,
-          selectedCategories: state.selectedCategories.filter(
-            (cat) => cat !== action.payload
-          ),
-        };
-      }
-
-      if (state.selectedCategories.length > 2) {
-        return state;
-      }
-
+    updateSkill: (state, action: RdxAction<Skill>) => {
       return {
         ...state,
-        selectedCategories: [...state.selectedCategories, action.payload],
+        skills: state.skills.map((sk) =>
+          sk.title === action.payload.title ? action.payload : sk
+        ),
       };
     },
-    postImage: (state, action: RdxAction<FullLineImage>) => {
-      if (state.selectedCategories.length === 0) {
-        return state;
-      }
-
-      const thisWeek = new Date();
-      thisWeek.setDate(new Date().getDate() - 7);
-
-      let newCategories = state.categories.map((cat) => {
-        if (state.selectedCategories.some((c) => c === cat.id)) {
-          return { ...cat, images: [action.payload, ...cat.images] };
-        }
-
-        return cat;
-      });
-
-      const count = Math.max(
-        ...newCategories.map(
-          (c) => c.images.filter((im) => new Date(im.date) >= thisWeek).length
-        )
-      );
-
-      newCategories = newCategories.map((cat) => {
-        let rtnrCat = cat;
-
-        if (count > 0) {
-          const imageCount = rtnrCat.images.filter(
-            (im) => new Date(im.date) >= thisWeek
-          ).length;
-
-          rtnrCat = {
-            ...rtnrCat,
-            height: imageCount > 0 ? (imageCount / count) * 100 : 0,
-          };
-        }
-
-        return rtnrCat;
-      });
-
-      const data = getDominantCategories(newCategories);
-
+    completeTask: (state, action: RdxAction<{ skill: Skill; task: Task }>) => {
       return {
         ...state,
-        categories: newCategories,
-        selectedCategories: [],
-        reflection: data,
+        skills: state.skills.map((sk) =>
+          sk.title === action.payload.skill.title
+            ? {
+                ...action.payload.skill,
+                xp: action.payload.skill.xp + action.payload.task.xp,
+              }
+            : sk
+        ),
       };
     },
   },
 });
 
-export const {
-  setCategories,
-  setTutorialOpen,
-  setCurrentCategory,
-  selectCategory,
-  postImage,
-  loadState,
-} = appSlice.actions;
+export const { loadState } = appSlice.actions;
 
 export const selectApp = (state: any) => state.app;
 

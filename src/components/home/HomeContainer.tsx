@@ -1,72 +1,20 @@
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { AppInfo, selectApp } from "../../redux/slices/appSlice";
 import { useSelector } from "react-redux";
-import CategoryIcon from "./CategoryIcon";
-import CameraButton from "../camera/CameraButton";
-import CalendarComponent from "./CalendarComponent";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { accent, white } from "../../styles/colors";
-import { getDominantCategories } from "../reflection/getDominantCategories";
-import ReflectionContainer from "../reflection/ReflectionContainer";
 
 const HomeContainer = () => {
   const appInfo: AppInfo = useSelector(selectApp);
 
-  const [reflectionOpen, setReflectionOpen] = useState(false);
-
-  if (!appInfo.categories) {
+  if (!appInfo.skills) {
     return null;
   }
 
   return (
     <View style={{ flex: 1, width: "100%" }}>
-      {reflectionOpen && (
-        <ReflectionContainer close={() => setReflectionOpen(false)} />
-      )}
-
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.categoriesContainer}>
-          {appInfo.categories.map((category, index) => (
-            <CategoryIcon {...category} key={index} />
-          ))}
-        </View>
-
-        <CalendarComponent />
+        <View style={styles.homeContainer}></View>
       </ScrollView>
-
-      <View
-        style={{
-          position: "absolute",
-          bottom: 30,
-          left: 0,
-          width: "100%",
-          alignItems: "center",
-          flexDirection: "row",
-          justifyContent: "center",
-        }}
-      >
-        <View style={{ width: 50, marginRight: 20 }} />
-
-        <CameraButton />
-
-        <TouchableOpacity
-          style={{
-            width: 50,
-            marginLeft: 20,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: white,
-            borderWidth: 2,
-            borderColor: accent,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onPress={() => setReflectionOpen(true)}
-        >
-          <FontAwesome5 name="fire-alt" size={30} color={accent} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -79,7 +27,7 @@ const styles = StyleSheet.create({
     height: "100%",
     paddingTop: 30,
   },
-  categoriesContainer: {
+  homeContainer: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
