@@ -53,7 +53,7 @@ const NewSkill = () => {
         />
       </View>
 
-      <View style={{ width: "100%", marginTop: 12 }}>
+      <View style={{ width: "100%", marginTop: 12, flex: 1 }}>
         <Text style={{ fontWeight: "300" }}>Task name</Text>
         <View style={{ flexDirection: "row", marginTop: 8 }}>
           <TextInput
@@ -147,7 +147,7 @@ const NewSkill = () => {
         <View style={{ height: 20 }} />
 
         {tasks.length ? <Text>Tasks:</Text> : null}
-        
+
         {tasks.map((task, i) => (
           <View
             key={i}

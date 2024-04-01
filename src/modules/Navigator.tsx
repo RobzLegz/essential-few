@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppInfo, selectApp } from "../redux/slices/appSlice";
 import NewSkillScreen from "../screens/NewSkill";
+import { Button } from "react-native";
 
 const Stack = createStackNavigator();
 
