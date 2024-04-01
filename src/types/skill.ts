@@ -1,4 +1,5 @@
 export interface Skill {
+  color: string;
   title: string;
   description: string;
   tasks: Task[];

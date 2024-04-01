@@ -65,7 +65,13 @@ export const appSlice: any = createSlice({
   },
 });
 
-export const { loadState } = appSlice.actions;
+export const {
+  loadState,
+  addNewSkill,
+  removeSkill,
+  updateSkill,
+  completeTask,
+} = appSlice.actions;
 
 export const selectApp = (state: any) => state.app;
 
