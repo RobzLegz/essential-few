@@ -144,35 +144,39 @@ const NewSkill = () => {
           </View>
         ) : null}
 
+        <View style={{ height: 20 }} />
+
+        {tasks.length ? <Text>Tasks:</Text> : null}
+        
         {tasks.map((task, i) => (
           <View
             key={i}
             style={{
               width: "100%",
               flexDirection: "row",
-              marginTop: 12,
+              marginTop: 10,
               paddingHorizontal: 12,
+              paddingVertical: 4,
               borderWidth: 0.5,
               borderRadius: 6,
               alignItems: "center",
             }}
           >
-            <Text style={{ color: darkGray }}>{task.title}</Text>
+            <Text style={{ color: darkGray, flex: 1 }}>{task.title}</Text>
             <Text style={{ marginLeft: 12, marginRight: 4, color: accent }}>
               {task.xp}
             </Text>
             <FontAwesome5 name="coins" size={16} color={accent} />
-            <View style={{ flex: 1 }} />
             <TouchableOpacity
               style={{
+                marginLeft: 12,
                 height: 48,
-                width: 20,
                 alignItems: "center",
                 justifyContent: "center",
               }}
               onPress={() => setTasks(tasks.filter((t, j) => j !== i))}
             >
-              <Feather name="trash" size={24} color={red} />
+              <Feather name="trash" size={28} color={red} />
             </TouchableOpacity>
           </View>
         ))}
