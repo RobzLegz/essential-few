@@ -7,9 +7,10 @@ import {
   Roboto_700Bold,
   Roboto_500Medium,
 } from "@expo-google-fonts/roboto";
-import loadStateFromMMKV from "../middlewares/mmkvLoader";
+// import loadStateFromMMKV from "../middlewares/mmkvLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { AppInfo, selectApp } from "../redux/slices/appSlice";
+import NewSkillScreen from "../screens/NewSkill";
 
 const Stack = createStackNavigator();
 
@@ -35,7 +36,7 @@ const Navigator = () => {
 
   useEffect(() => {
     if (!stateLoaded.current) {
-      loadStateFromMMKV(dispatch);
+      // loadStateFromMMKV(dispatch);
 
       stateLoaded.current = true;
     }
@@ -51,6 +52,16 @@ const Navigator = () => {
         name="Home"
         component={HomeScreen}
         options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="Create"
+        component={NewSkillScreen}
+        options={{
+          headerTitle: "Add skill",
+          headerBackTitle: "Back",
+          headerShown: true,
+        }}
       />
     </Stack.Navigator>
   );

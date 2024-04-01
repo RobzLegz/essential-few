@@ -1,11 +1,11 @@
-import { Middleware } from "@reduxjs/toolkit";
-import { storage } from "../lib/mmkv";
+// import { Middleware } from "@reduxjs/toolkit";
+// import { storage } from "../lib/mmkv";
 
-export const mmkvMiddleware: Middleware = (storeApi) => (next) => (action) => {
-  const result = next(action);
+// export const mmkvMiddleware: Middleware = (storeApi) => (next) => (action) => {
+//   const result = next(action);
 
-  storage.setString("redux-state", JSON.stringify(storeApi.getState().app));
-  return result;
-};
+//   storage.setString("redux-state", JSON.stringify(storeApi.getState().app));
+//   return result;
+// };
 
-export default mmkvMiddleware;
+// export default mmkvMiddleware;

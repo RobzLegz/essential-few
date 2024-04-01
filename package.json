@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "npx expo start",
-    "start": "npx expo start",
+    "dev": "npx expo start --dev-client",
+    "start": "npx expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
     "@expo-google-fonts/roboto": "^0.2.3",
+    "@expo/vector-icons": "^14.0.0",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/stack": "^6.3.16",
     "@reduxjs/toolkit": "^1.9.2",

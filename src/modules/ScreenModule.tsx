@@ -9,7 +9,23 @@ const ScreenModule: React.FC<{
   statusBgColor?: string;
   barStyle?: StatusBarStyle;
   bgColor?: string;
-}> = ({ children, statusBgColor = "#000000", barStyle = "light" }) => {
+  headerShown?: boolean;
+}> = ({
+  children,
+  headerShown,
+  statusBgColor = "#000000",
+  barStyle = "light",
+}) => {
+  if (headerShown) {
+    return (
+      <Fragment>
+        <StatusBar backgroundColor={statusBgColor} style={barStyle} />
+        <View style={{ flex: 0, backgroundColor: statusBgColor, height: 0 }} />
+        <View style={basicScreen}>{children}</View>
+      </Fragment>
+    );
+  }
+
   return (
     <Fragment>
       <StatusBar backgroundColor={statusBgColor} style={barStyle} />

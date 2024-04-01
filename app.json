@@ -13,18 +13,20 @@
     },
     "extra": {
       "eas": {
-        "projectId": "27b2b5c2-1ad5-43db-98c7-42c7ebf542d0"
+        "projectId": "571022ee-6c13-497c-ac25-e59113ba0e1e"
       }
     },
     "owner": "sussybob",
     "android": {
-      "package": "com.essential-few.app",
+      "package": "com.sussybob.essentialfew",
       "versionCode": 1
     },
     "ios": {
       "bundleIdentifier": "com.essential-few.app",
       "buildNumber": "1"
     },
-    "plugins": ["expo-build-properties"]
+    "plugins": [
+      "expo-build-properties"
+    ]
   }
 }
