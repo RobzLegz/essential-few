@@ -1,4 +1,5 @@
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,14 +18,16 @@ import {
   yellow,
 } from "../../styles/colors";
 import { Feather, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { addNewSkill } from "../../redux/slices/appSlice";
+import { AppInfo, addNewSkill, selectApp } from "../../redux/slices/appSlice";
 import { getRandomColor } from "../../utils/getRandomColor";
 
 const NewSkill = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
+
+  const appInfo: AppInfo = useSelector(selectApp);
 
   const [title, setTitle] = useState("");
   const [taskName, setTaskName] = useState("");
@@ -33,6 +36,11 @@ const NewSkill = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const addNewTask = () => {
+    if (tasks.some((t) => t.title === taskName)) {
+      Alert.alert("Tasks can't have the same title");
+      return;
+    }
+
     setTasks([...tasks, { title: taskName, xp: taskXp }]);
 
     setTaskFocused(false);
@@ -41,12 +49,19 @@ const NewSkill = () => {
   };
 
   const saveSkill = () => {
+    if (appInfo.skills.some((sk) => sk.title === title)) {
+      Alert.alert("You already have a skill with that title");
+      return;
+    }
+
     dispatch(
       addNewSkill({
         title: title,
         description: "",
         tasks,
         xp: 0,
+        level: 1,
+        currentXp: 0,
         color: getRandomColor(),
       })
     );
@@ -56,7 +71,7 @@ const NewSkill = () => {
 
   return (
     <View style={{ width: "100%" }}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={{ width: "100%" }}>
           <Text style={{ fontWeight: "300" }}>Title</Text>
 
@@ -203,6 +218,8 @@ const NewSkill = () => {
             </View>
           ))}
         </View>
+
+        <View style={{ height: 200 }} />
       </ScrollView>
       <View
         style={{

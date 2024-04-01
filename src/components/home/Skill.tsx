@@ -1,22 +1,54 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useState } from "react";
-import { Skill } from "../../types/skill";
-import { accent, darkGray, gray, green, red, white } from "../../styles/colors";
+import { Skill, Task } from "../../types/skill";
+import { black, darkGray, gray, white } from "../../styles/colors";
 import { calculateLevel } from "../../utils/calculateLevel";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
+import { completeTasks } from "../../redux/slices/appSlice";
+import { calculatePercentage } from "../../utils/calculatePercentage";
 
-const SkillComponent: React.FC<Skill> = ({ tasks, title, xp }) => {
-  const level = calculateLevel(xp);
+const SkillComponent: React.FC<Skill> = ({ ...props }) => {
+  const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
+  const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
+
+  const updateStats = () => {
+    dispatch(completeTasks({ tasks: selectedTasks, skill: props }));
+
+    setOpen(false);
+    setSelectedTasks([]);
+  };
 
   return (
     <TouchableOpacity
       onPress={() => setOpen(true)}
       disabled={open}
-      style={{ width: "100%", padding: 12, borderWidth: 0.5, borderRadius: 6 }}
+      style={{
+        width: "100%",
+        padding: 12,
+        borderWidth: 0.5,
+        borderRadius: 6,
+        marginBottom: 12,
+      }}
     >
-      <Text style={{ color: darkGray }}>{title}</Text>
+      <View
+        style={{
+          width: "100%",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Text>{props.title}</Text>
+      </View>
 
       <View
         style={{
@@ -27,7 +59,7 @@ const SkillComponent: React.FC<Skill> = ({ tasks, title, xp }) => {
           marginTop: 12,
         }}
       >
-        <Text style={{ color: darkGray }}>{level}</Text>
+        <Text style={{ color: darkGray }}>{props.level}</Text>
         <View
           style={{
             flex: 1,
@@ -43,13 +75,16 @@ const SkillComponent: React.FC<Skill> = ({ tasks, title, xp }) => {
         >
           <View
             style={{
-              width: "20%",
+              width: `${calculatePercentage(
+                props.currentXp,
+                Math.pow(2, props.level + 1)
+              )}%`,
               height: "100%",
-              backgroundColor: accent,
+              backgroundColor: props.color,
             }}
           />
         </View>
-        <Text style={{ color: darkGray }}>{level + 1}</Text>
+        <Text style={{ color: darkGray }}>{props.level + 1}</Text>
       </View>
 
       <View
@@ -61,62 +96,79 @@ const SkillComponent: React.FC<Skill> = ({ tasks, title, xp }) => {
         }}
       >
         <Text style={{ color: darkGray, fontWeight: "300", fontSize: 12 }}>
-          {xp}xp / {Math.pow(2, level)}xp
+          {props.currentXp}xp / {Math.pow(2, props.level + 1)}xp
         </Text>
       </View>
 
       {open ? (
-        <View style={{ width: "100%", marginTop: 10 }}>
-          {tasks.map((task, i) => (
-            <View
-              style={{
-                width: "100%",
-                padding: 6,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              key={i}
-            >
-              <View style={{ flex: 1 }}>
-                <Text>{task.title}</Text>
-              </View>
+        <View style={{ width: "100%", marginTop: 10, flexDirection: "row" }}>
+          <ScrollView
+            horizontal
+            style={{ flex: 1 }}
+            showsHorizontalScrollIndicator={false}
+          >
+            {props.tasks.map((task, i) => (
+              <TouchableOpacity
+                style={{
+                  padding: 6,
+                  height: 44,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: selectedTasks.some(
+                    (t) => t.title === task.title
+                  )
+                    ? props.color
+                    : gray,
+                  borderRadius: 6,
+                  borderWidth: 0.5,
+                  opacity: selectedTasks.some((t) => t.title === task.title)
+                    ? 1
+                    : 0.8,
+                  borderColor: selectedTasks.some((t) => t.title === task.title)
+                    ? props.color
+                    : undefined,
+                  marginRight: 6,
+                }}
+                key={i}
+                onPress={() => {
+                  if (selectedTasks.some((t) => t.title === task.title)) {
+                    setSelectedTasks(
+                      selectedTasks.filter((t) => t.title !== task.title)
+                    );
+                    return;
+                  }
 
-              <View style={{ height: 40, flexDirection: "row" }}>
-                <TouchableOpacity
+                  setSelectedTasks([...selectedTasks, task]);
+                }}
+              >
+                <Text
                   style={{
-                    height: "100%",
-                    width: 40,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: red,
-                    borderTopLeftRadius: 6,
-                    borderBottomLeftRadius: 6,
+                    color: selectedTasks.some((t) => t.title === task.title)
+                      ? white
+                      : darkGray,
                   }}
                 >
-                  <MaterialCommunityIcons
-                    name="minus"
-                    size={24}
-                    color={white}
-                  />
-                </TouchableOpacity>
+                  {task.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
-                <TouchableOpacity
-                  style={{
-                    height: "100%",
-                    width: 40,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: green,
-                    borderTopRightRadius: 6,
-                    borderBottomRightRadius: 6,
-                  }}
-                >
-                  <MaterialCommunityIcons name="plus" size={24} color={white} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+          <TouchableOpacity
+            style={{
+              height: 44,
+              backgroundColor: black,
+              borderRadius: 6,
+              marginLeft: 6,
+              alignItems: "center",
+              justifyContent: "center",
+              width: 60,
+            }}
+            onPress={updateStats}
+          >
+            <MaterialIcons name="check" size={28} color={white} />
+          </TouchableOpacity>
         </View>
       ) : null}
     </TouchableOpacity>

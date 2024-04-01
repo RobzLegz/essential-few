@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Skill, Task } from "../../types/skill";
+import { calculateLevel } from "../../utils/calculateLevel";
+import { calculateCurrentXP } from "../../utils/calculateCurrentXp";
 
 export interface RdxAction<T> {
   type: string;
@@ -8,10 +10,16 @@ export interface RdxAction<T> {
 
 export interface AppInfo {
   skills: Skill[];
+  xp: number;
+  level: number;
+  currentXp: number;
 }
 
 const initialState: AppInfo = {
   skills: [],
+  xp: 0,
+  level: 1,
+  currentXp: 0,
 };
 
 export const appSlice: any = createSlice({
@@ -23,11 +31,7 @@ export const appSlice: any = createSlice({
         return state;
       }
 
-      let { skills } = action.payload;
-
-      return {
-        skills,
-      };
+      return action.payload;
     },
     addNewSkill: (state, action: RdxAction<Skill>) => {
       return {
@@ -49,17 +53,45 @@ export const appSlice: any = createSlice({
         ),
       };
     },
-    completeTask: (state, action: RdxAction<{ skill: Skill; task: Task }>) => {
+    completeTasks: (
+      state,
+      action: RdxAction<{ skill: Skill; tasks: Task[] }>
+    ) => {
+      let globalXp = state.xp;
+
+      const newSkills = state.skills.map((sk) => {
+        if (sk.title === action.payload.skill.title) {
+          const prevXp = action.payload.skill.xp;
+          const newXp = action.payload.tasks
+            .map((t) => t.xp)
+            .reduce((a, b) => a + b, 0);
+
+          const totalXp = prevXp + newXp;
+          globalXp += newXp;
+
+          const lvl = calculateLevel(totalXp);
+          const currentXp = calculateCurrentXP(totalXp);
+
+          return {
+            ...sk,
+            xp: totalXp,
+            level: lvl,
+            currentXp,
+          };
+        }
+
+        return sk;
+      });
+
+      const lvl = calculateLevel(globalXp);
+      const currentXp = calculateCurrentXP(globalXp);
+
       return {
         ...state,
-        skills: state.skills.map((sk) =>
-          sk.title === action.payload.skill.title
-            ? {
-                ...action.payload.skill,
-                xp: action.payload.skill.xp + action.payload.task.xp,
-              }
-            : sk
-        ),
+        skills: newSkills,
+        xp: globalXp,
+        level: lvl,
+        currentXp: currentXp,
       };
     },
   },
@@ -70,7 +102,7 @@ export const {
   addNewSkill,
   removeSkill,
   updateSkill,
-  completeTask,
+  completeTasks,
 } = appSlice.actions;
 
 export const selectApp = (state: any) => state.app;

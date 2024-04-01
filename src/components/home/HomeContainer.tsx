@@ -14,15 +14,12 @@ import { accent, darkGray, gray } from "../../styles/colors";
 import { useNavigation } from "@react-navigation/native";
 import Skill from "./Skill";
 import { calculateLevel } from "../../utils/calculateLevel";
+import { calculatePercentage } from "../../utils/calculatePercentage";
 
 const HomeContainer = () => {
   const navigation = useNavigation<any>();
 
   const appInfo: AppInfo = useSelector(selectApp);
-
-  const xp = appInfo.skills.map((s) => s.xp).reduce((a, b) => a + b, 0);
-
-  const level = calculateLevel(xp);
 
   if (!appInfo.skills) {
     return null;
@@ -72,7 +69,7 @@ const HomeContainer = () => {
               marginTop: 12,
             }}
           >
-            <Text style={{ color: darkGray }}>{level}</Text>
+            <Text style={{ color: darkGray }}>{appInfo.level}</Text>
             <View
               style={{
                 flex: 1,
@@ -88,17 +85,21 @@ const HomeContainer = () => {
             >
               <View
                 style={{
-                  width: "20%",
+                  width: `${calculatePercentage(
+                    appInfo.currentXp,
+                    Math.pow(2, appInfo.level + 1)
+                  )}%`,
                   height: "100%",
                   backgroundColor: accent,
                 }}
               />
             </View>
-            <Text style={{ color: darkGray }}>{level + 1}</Text>
+            <Text style={{ color: darkGray }}>{appInfo.level + 1}</Text>
           </View>
 
           <Text style={{ color: darkGray, fontWeight: "300", marginTop: 10 }}>
-            {xp}xp / {Math.pow(2, level)}xp
+            {appInfo.currentXp}xp / {Math.pow(2, appInfo.level + 1)}
+            xp
           </Text>
         </View>
 
